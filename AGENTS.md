@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- The game collection is stored in the browser's localStorage under the original key `colecionador_jogos`, read/written only through `src/lib/games.ts` and `useGameCollection` (read after hydration). Why: preserves the original single-file app's per-browser storage and data shape.
+- Collection business rules (currency rates, cost per hour, platinum, filters) live as pure functions in `src/lib/games.ts` with tests in `src/test/games.test.ts`. Why: keeps rules testable and separate from UI.

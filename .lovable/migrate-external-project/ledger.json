@@ -1,0 +1,90 @@
+{
+  "source": "code-archive",
+  "artifact": "gemini-code-1793968460767.zip (single HTML file, Tailwind CDN + Lucide CDN + inline script)",
+  "capabilities": [
+    {
+      "capability": "code",
+      "source": "Single-page game collection catalog (Portuguese UI): header, currency selector, search/platform/status filters, card grid, add/edit modal, delete",
+      "outcome": "migrate",
+      "status": "verified",
+      "next_action": "none"
+    },
+    {
+      "capability": "design",
+      "source": "Orange gradient background, Press Start 2P + Plus Jakarta Sans, pixel borders, blue stroked title, emerald footer",
+      "outcome": "migrate",
+      "status": "verified",
+      "next_action": "none"
+    },
+    {
+      "capability": "schema",
+      "source": "No database. Game objects in browser localStorage key 'colecionador_jogos'",
+      "outcome": "migrate",
+      "status": "verified",
+      "next_action": "none"
+    },
+    {
+      "capability": "records",
+      "source": "Per-browser localStorage only; one seed game (Elden Ring). No server-side export exists",
+      "outcome": "migrate",
+      "status": "pending",
+      "next_action": "Seed game restored. Games saved in the old HTML file live only in that browser; offer an import button or Lovable Cloud sync if the user wants them here"
+    },
+    {
+      "capability": "auth identities",
+      "source": "None",
+      "outcome": "not applicable",
+      "status": "verified",
+      "next_action": "none"
+    },
+    {
+      "capability": "authorization",
+      "source": "None",
+      "outcome": "not applicable",
+      "status": "verified",
+      "next_action": "none"
+    },
+    {
+      "capability": "uploaded file bytes",
+      "source": "None (cover images are external URLs)",
+      "outcome": "not applicable",
+      "status": "verified",
+      "next_action": "none"
+    },
+    {
+      "capability": "external providers",
+      "source": "Tailwind CDN, Lucide CDN, Google Fonts, Unsplash image URLs",
+      "outcome": "replace CDNs with bundled Tailwind v4 + lucide-react; keep Google Fonts and Unsplash URLs",
+      "status": "verified",
+      "next_action": "none"
+    },
+    {
+      "capability": "public endpoints / callbacks / webhooks / schedules",
+      "source": "None",
+      "outcome": "not applicable",
+      "status": "verified",
+      "next_action": "none"
+    },
+    {
+      "capability": "secrets",
+      "source": "None",
+      "outcome": "not applicable",
+      "status": "verified",
+      "next_action": "none"
+    },
+    {
+      "capability": "cutover",
+      "source": "Static HTML file",
+      "outcome": "publish Lovable app",
+      "status": "pending",
+      "next_action": "User publishes when ready"
+    },
+    {
+      "capability": "verification",
+      "source": "-",
+      "outcome": "build, tests, browser CRUD/filter/currency check",
+      "status": "verified",
+      "next_action": "none (typecheck clean, 15 tests pass, browser add/edit/search/currency/reload/delete checked)"
+    }
+  ]
+}
