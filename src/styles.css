@@ -5,9 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system: "Coisas de Colecionador" retro arcade look.
- * Sunset-orange gradient sky, chunky pixel borders with hard ink shadows,
- * Press Start 2P for display text and Plus Jakarta Sans for body copy.
+ * Design system: "Coisas de Colecionador" — retro pixel-art dusk.
+ * Sunset sky with soft pixel banding, striped pixel sun, chunky ink borders,
+ * pixel grass footer. Dark (dusk/night) is the default; light is golden hour.
  * All colors are oklch tokens; components only use the semantic utilities.
  */
 
@@ -52,9 +52,6 @@
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-success-deep: var(--success-deep);
-  --color-success-strong: var(--success-strong);
-  --color-trophy: var(--trophy);
-  --color-trophy-foreground: var(--trophy-foreground);
   --color-star: var(--star);
   --color-chip: var(--chip);
   --color-chip-foreground: var(--chip-foreground);
@@ -62,6 +59,8 @@
   --color-tag-difficulty-foreground: var(--tag-difficulty-foreground);
   --color-tag-verdict: var(--tag-verdict);
   --color-tag-verdict-foreground: var(--tag-verdict-foreground);
+  --color-live: var(--live);
+  --color-dirt-foreground: var(--dirt-foreground);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -78,16 +77,23 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Light: golden-hour sunset */
 :root {
   --radius: 0.5rem;
 
-  /* Sunset sky behind everything */
-  --sky-top: oklch(0.83 0.14 70);
-  --sky-mid: oklch(0.88 0.12 82);
-  --sky-bottom: oklch(0.72 0.19 52);
-  --gradient-sky: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 40%, var(--sky-bottom) 100%);
+  --sky-1: oklch(0.88 0.1 80);
+  --sky-2: oklch(0.85 0.12 72);
+  --sky-3: oklch(0.81 0.14 64);
+  --sky-4: oklch(0.77 0.16 56);
+  --sky-5: oklch(0.72 0.18 48);
+  --sky-6: oklch(0.67 0.19 40);
+  --sun-top: oklch(0.97 0.1 95);
+  --sun-bottom: oklch(0.82 0.17 60);
+  --sun-glow: oklch(0.95 0.12 85 / 55%);
+  --star-dot: oklch(1 0 0 / 0%);
+  --scanline: oklch(1 0 0 / 6%);
 
-  --background: oklch(0.83 0.14 70);
+  --background: oklch(0.8 0.15 65);
   --foreground: oklch(0.279 0.041 260.031);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.279 0.041 260.031);
@@ -97,36 +103,45 @@
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.929 0.013 255.508);
   --secondary-foreground: oklch(0.372 0.044 257.287);
-  --muted: oklch(0.984 0.003 247.858);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.5 0.046 257.417);
+  --accent: oklch(0.95 0.01 250);
   --accent-foreground: oklch(0.279 0.041 260.031);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(1 0 0);
   --destructive-soft: oklch(0.971 0.013 17.38);
   --destructive-border: oklch(0.885 0.062 18.334);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.869 0.022 252.894);
+  --border: oklch(0.91 0.015 255);
+  --input: oklch(0.85 0.022 252.894);
   --ring: oklch(0.623 0.214 259.815);
 
-  /* Arcade accents */
   --ink: oklch(0.279 0.041 260.031);
   --title: oklch(1 0 0);
-  --title-stroke: oklch(0.55 0.16 250);
-  --title-shadow: oklch(0.42 0.13 252);
-  --success: oklch(0.696 0.17 162.48);
+  --title-stroke: oklch(0.5 0.19 258);
+  --title-shadow: oklch(0.36 0.15 262);
+  --success: oklch(0.66 0.17 155);
   --success-foreground: oklch(1 0 0);
-  --success-deep: oklch(0.596 0.145 163.225);
-  --success-strong: oklch(0.432 0.095 166.913);
-  --trophy: oklch(0.828 0.189 84.429);
-  --trophy-foreground: oklch(0.279 0.077 45.635);
-  --star: oklch(0.769 0.188 70.08);
+  --success-deep: oklch(0.56 0.15 158);
+  --star: oklch(0.8 0.17 80);
   --chip: oklch(0.208 0.042 265.755 / 80%);
   --chip-foreground: oklch(1 0 0);
-  --tag-difficulty: oklch(0.962 0.018 272.314);
-  --tag-difficulty-foreground: oklch(0.457 0.24 277.023);
-  --tag-verdict: oklch(0.977 0.014 308.299);
-  --tag-verdict-foreground: oklch(0.496 0.265 301.924);
+  --tag-difficulty: oklch(0.95 0.03 255);
+  --tag-difficulty-foreground: oklch(0.45 0.18 260);
+  --tag-verdict: oklch(0.95 0.05 70);
+  --tag-verdict-foreground: oklch(0.5 0.15 45);
+  --live: oklch(0.66 0.17 155);
+
+  --platinum-1: oklch(0.82 0.03 245);
+  --platinum-2: oklch(0.94 0.02 230);
+  --platinum-glow: oklch(0.85 0.12 230 / 70%);
+  --platinum-foreground: oklch(0.28 0.05 260);
+
+  --grass: oklch(0.62 0.17 145);
+  --grass-light: oklch(0.74 0.18 140);
+  --grass-dark: oklch(0.5 0.14 150);
+  --dirt: oklch(0.5 0.08 55);
+  --dirt-speck: oklch(0.42 0.07 50);
+  --dirt-foreground: oklch(0.97 0.03 85);
 
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -143,20 +158,95 @@
   --sidebar-ring: oklch(0.623 0.214 259.815);
 }
 
+/* Dark (default): dusk turning to night */
+.dark {
+  color-scheme: dark;
+
+  --sky-1: oklch(0.16 0.035 268);
+  --sky-2: oklch(0.2 0.05 275);
+  --sky-3: oklch(0.26 0.07 300);
+  --sky-4: oklch(0.34 0.1 345);
+  --sky-5: oklch(0.45 0.14 20);
+  --sky-6: oklch(0.58 0.17 45);
+  --sun-top: oklch(0.9 0.14 85);
+  --sun-bottom: oklch(0.66 0.21 30);
+  --sun-glow: oklch(0.7 0.19 40 / 35%);
+  --star-dot: oklch(0.97 0.02 90 / 85%);
+  --scanline: oklch(0 0 0 / 12%);
+
+  --background: oklch(0.16 0.035 268);
+  --foreground: oklch(0.95 0.01 260);
+  --card: oklch(0.22 0.035 268);
+  --card-foreground: oklch(0.95 0.01 260);
+  --popover: oklch(0.22 0.035 268);
+  --popover-foreground: oklch(0.95 0.01 260);
+  --primary: oklch(0.62 0.2 258);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.3 0.035 268);
+  --secondary-foreground: oklch(0.88 0.02 260);
+  --muted: oklch(0.265 0.035 268);
+  --muted-foreground: oklch(0.72 0.03 265);
+  --accent: oklch(0.3 0.04 268);
+  --accent-foreground: oklch(0.95 0.01 260);
+  --destructive: oklch(0.66 0.2 25);
+  --destructive-foreground: oklch(1 0 0);
+  --destructive-soft: oklch(0.3 0.08 25);
+  --destructive-border: oklch(0.45 0.13 25);
+  --border: oklch(0.33 0.035 268);
+  --input: oklch(0.4 0.04 268);
+  --ring: oklch(0.68 0.18 258);
+
+  --ink: oklch(0.08 0.02 270);
+  --title-stroke: oklch(0.52 0.21 258);
+  --title-shadow: oklch(0.3 0.14 262);
+  --success: oklch(0.64 0.16 155);
+  --success-deep: oklch(0.55 0.14 158);
+  --star: oklch(0.84 0.16 85);
+  --chip: oklch(0.1 0.02 270 / 80%);
+  --tag-difficulty: oklch(0.3 0.07 258);
+  --tag-difficulty-foreground: oklch(0.84 0.09 250);
+  --tag-verdict: oklch(0.32 0.07 50);
+  --tag-verdict-foreground: oklch(0.86 0.12 65);
+  --live: oklch(0.75 0.17 150);
+
+  --platinum-glow: oklch(0.8 0.13 230 / 65%);
+
+  --grass: oklch(0.46 0.12 150);
+  --grass-light: oklch(0.56 0.14 145);
+  --grass-dark: oklch(0.36 0.1 155);
+  --dirt: oklch(0.32 0.05 50);
+  --dirt-speck: oklch(0.26 0.04 45);
+  --dirt-foreground: oklch(0.92 0.04 85);
+}
+
 /* Chunky retro frame: thick ink border with a hard offset shadow */
 @utility pixel-border {
   border: 3px solid var(--ink);
   box-shadow: 4px 4px 0 var(--ink);
 }
 
-/* Blue outlined arcade title */
+/* White pixel title with a strong blue outline */
 @utility text-stroke {
+  text-shadow:
+    -3px -3px 0 var(--title-stroke),
+    0 -3px 0 var(--title-stroke),
+    3px -3px 0 var(--title-stroke),
+    3px 0 0 var(--title-stroke),
+    3px 3px 0 var(--title-stroke),
+    0 3px 0 var(--title-stroke),
+    -3px 3px 0 var(--title-stroke),
+    -3px 0 0 var(--title-stroke),
+    0 7px 0 var(--title-shadow),
+    4px 7px 0 var(--title-shadow);
+}
+
+@utility text-stroke-sm {
   text-shadow:
     -2px -2px 0 var(--title-stroke),
     2px -2px 0 var(--title-stroke),
     -2px 2px 0 var(--title-stroke),
     2px 2px 0 var(--title-stroke),
-    0 4px 0 var(--title-shadow);
+    0 3px 0 var(--title-shadow);
 }
 
 /* Form controls */
@@ -183,6 +273,143 @@
   border-color: var(--input);
 }
 
+/* Striped pixel sun */
+@utility pixel-sun {
+  border-radius: 9999px;
+  background: linear-gradient(180deg, var(--sun-top), var(--sun-bottom));
+  mask-image: linear-gradient(
+    180deg,
+    #000 0 52%,
+    transparent 52% 56%,
+    #000 56% 64%,
+    transparent 64% 69%,
+    #000 69% 76%,
+    transparent 76% 82%,
+    #000 82% 88%,
+    transparent 88% 95%,
+    #000 95%
+  );
+}
+
+@utility sun-glow {
+  border-radius: 9999px;
+  background: radial-gradient(circle, var(--sun-glow) 0%, transparent 65%);
+}
+
+/* Shiny Platina seal */
+@utility platinum-seal {
+  color: var(--platinum-foreground);
+  border: 2px solid var(--ink);
+  background: linear-gradient(
+    110deg,
+    var(--platinum-1) 0%,
+    var(--platinum-2) 35%,
+    oklch(1 0 0) 50%,
+    var(--platinum-2) 65%,
+    var(--platinum-1) 100%
+  );
+  background-size: 250% 100%;
+  box-shadow:
+    0 0 14px var(--platinum-glow),
+    2px 2px 0 var(--ink);
+  animation: platinum-shine 2.6s ease-in-out infinite;
+}
+
+/* Trophy progress bar */
+@utility pixel-track {
+  background: var(--card);
+  border: 2px solid var(--ink);
+}
+
+@utility pixel-fill {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--star) 0 10px,
+    var(--sun-bottom) 10px 12px
+  );
+  transition: width 400ms;
+}
+
+@keyframes platinum-shine {
+  0% {
+    background-position: 120% 0;
+  }
+  60%,
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+@layer components {
+  /* Night stars (visible in dark mode only) */
+  .sky-stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(var(--star-dot) 1.5px, transparent 1.5px),
+      radial-gradient(var(--star-dot) 1px, transparent 1px);
+    background-size:
+      140px 120px,
+      90px 70px;
+    background-position:
+      10px 20px,
+      50px 40px;
+    mask-image: linear-gradient(180deg, #000 0%, transparent 55%);
+  }
+
+  /* Grass blades on top + grass band */
+  .pixel-grass {
+    position: relative;
+    z-index: 1;
+    margin-top: 24px;
+    background: var(--grass);
+    padding-top: 14px;
+    box-shadow: inset 0 4px 0 var(--grass-light);
+  }
+  .pixel-grass::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -16px;
+    height: 16px;
+    background: var(--grass);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' shape-rendering='crispEdges'%3E%3Cpath d='M0 16V8h4V4h4v4h4V0h4v6h4v4h4V2h4v6h4v8z'/%3E%3C/svg%3E")
+      repeat-x left bottom / 32px 16px;
+  }
+  .pixel-grass::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -10px;
+    height: 10px;
+    background: var(--grass-light);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10' shape-rendering='crispEdges'%3E%3Cpath d='M2 10V4h4v6zM14 10V0h4v10z'/%3E%3C/svg%3E")
+      repeat-x 8px bottom / 24px 10px;
+  }
+
+  /* Dirt under the grass, with pixel specks */
+  .pixel-dirt {
+    background-color: var(--dirt);
+    background-image:
+      linear-gradient(var(--grass-dark), var(--grass-dark)),
+      linear-gradient(var(--dirt-speck), var(--dirt-speck)),
+      linear-gradient(var(--dirt-speck), var(--dirt-speck));
+    background-size:
+      100% 4px,
+      4px 4px,
+      4px 4px;
+    background-position:
+      0 0,
+      12px 18px,
+      30px 34px;
+    background-repeat: repeat-x;
+  }
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -191,8 +418,26 @@
   body {
     min-height: 100vh;
     font-family: var(--font-sans);
-    background: var(--gradient-sky);
-    background-color: var(--color-background);
     color: var(--color-foreground);
+    background-color: var(--color-background);
+    /* Soft pixel-sunset bands with a faint scanline texture */
+    background-image:
+      repeating-linear-gradient(180deg, transparent 0 6px, var(--scanline) 6px 8px),
+      linear-gradient(
+        180deg,
+        var(--sky-1) 0%,
+        var(--sky-2) 22%,
+        var(--sky-3) 42%,
+        var(--sky-4) 60%,
+        var(--sky-5) 78%,
+        var(--sky-6) 100%
+      );
+    background-attachment: fixed;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .platinum-seal {
+      animation: none;
+    }
   }
 }

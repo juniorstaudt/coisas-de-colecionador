@@ -1,14 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { fetchLiveRates } from "@/lib/exchange-rates";
 import {
   SEED_GAMES,
   STORAGE_KEY,
   costPerHour,
   filterGames,
+  formatDate,
   formatPrice,
+  imageIdsOf,
   isPlatinum,
   loadGames,
   upsertGame,
+  youtubeId,
   type Game,
 } from "@/lib/games";
 
@@ -28,14 +32,37 @@ describe("currency conversion", () => {
   it("shows BRL prices unchanged", () => {
     expect(formatPrice(299.9, "BRL")).toBe("R$ 299.90");
   });
-  it("converts to USD at 0.18", () => {
+  it("falls back to USD at 0.18 without live rates", () => {
     expect(formatPrice(100, "USD")).toBe("$ 18.00");
   });
-  it("converts to EUR at 0.17", () => {
+  it("falls back to EUR at 0.17 without live rates", () => {
     expect(formatPrice(100, "EUR")).toBe("€ 17.00");
+  });
+  it("uses live rates when provided", () => {
+    expect(formatPrice(100, "USD", { BRL: 1, USD: 0.2, EUR: 0.16 })).toBe("$ 20.00");
   });
   it("shows Grátis when there is no price", () => {
     expect(formatPrice(undefined, "BRL")).toBe("Grátis");
+  });
+});
+
+describe("live exchange rates", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("reads BRL→USD/EUR from the rate service", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(JSON.stringify({ date: "2026-11-05", rates: { USD: 0.183, EUR: 0.163 } }))),
+    );
+    await expect(fetchLiveRates()).resolves.toEqual({
+      rates: { BRL: 1, USD: 0.183, EUR: 0.163 },
+      date: "2026-11-05",
+    });
+  });
+
+  it("fails when the service is down so the fallback is used", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("", { status: 503 })));
+    await expect(fetchLiveRates()).rejects.toThrow();
   });
 });
 
@@ -48,12 +75,12 @@ describe("cost per hour", () => {
   });
 });
 
-describe("platinum badge", () => {
-  it("is earned when all trophies are unlocked", () => {
-    expect(isPlatinum({ trophiesUnlocked: 42, trophiesTotal: 42 })).toBe(true);
+describe("platinum seal", () => {
+  it("is earned when trophies obtained equal the total", () => {
+    expect(isPlatinum({ trophiesUnlocked: 50, trophiesTotal: 50 })).toBe(true);
   });
-  it("is not earned with trophies missing", () => {
-    expect(isPlatinum({ trophiesUnlocked: 41, trophiesTotal: 42 })).toBe(false);
+  it("is not earned at 35/50", () => {
+    expect(isPlatinum({ trophiesUnlocked: 35, trophiesTotal: 50 })).toBe(false);
   });
   it("is not earned by a game with no trophies", () => {
     expect(isPlatinum({ trophiesUnlocked: 0, trophiesTotal: 0 })).toBe(false);
@@ -68,8 +95,32 @@ describe("filters", () => {
   it("searches by studio, case-insensitive", () => {
     expect(filterGames(games, { search: "fromsoft", platform: "", status: "" }).map((g) => g.id)).toEqual(["1"]);
   });
+  it("searches by publisher", () => {
+    expect(filterGames(games, { search: "nintendo", platform: "", status: "" }).map((g) => g.id)).toEqual(["2"]);
+  });
   it("filters by platform and status together", () => {
     expect(filterGames(games, { search: "", platform: "Switch", status: "Jogando" }).map((g) => g.id)).toEqual(["2"]);
+  });
+});
+
+describe("YouTube links", () => {
+  it("reads watch links", () => {
+    expect(youtubeId("https://www.youtube.com/watch?v=E3Huy2cdih0")).toBe("E3Huy2cdih0");
+  });
+  it("reads youtu.be short links", () => {
+    expect(youtubeId("https://youtu.be/E3Huy2cdih0?t=10")).toBe("E3Huy2cdih0");
+  });
+  it("reads shorts links", () => {
+    expect(youtubeId("https://youtube.com/shorts/E3Huy2cdih0")).toBe("E3Huy2cdih0");
+  });
+  it("rejects non-YouTube links", () => {
+    expect(youtubeId("https://vimeo.com/123")).toBeNull();
+  });
+});
+
+describe("dates", () => {
+  it("shows purchase dates as dd/mm/yyyy", () => {
+    expect(formatDate("2022-02-25")).toBe("25/02/2022");
   });
 });
 
@@ -81,7 +132,14 @@ describe("storage", () => {
     const saved = [{ ...base, id: "9", title: "Hades" }];
     expect(loadGames(memoryStorage({ [STORAGE_KEY]: JSON.stringify(saved) }))[0]?.title).toBe("Hades");
   });
+  it("gives games saved by the old version an empty gallery", () => {
+    const { photoIds: _omit, ...old } = base;
+    expect(loadGames(memoryStorage({ [STORAGE_KEY]: JSON.stringify([old]) }))[0]?.photoIds).toEqual([]);
+  });
   it("adds new games to the top of the collection", () => {
     expect(upsertGame([base], { ...base, id: "2", title: "Novo" })[0]?.title).toBe("Novo");
+  });
+  it("tracks the uploaded cover and gallery photos of a game", () => {
+    expect(imageIdsOf({ coverImageId: "c", photoIds: ["p1", "p2"] })).toEqual(["c", "p1", "p2"]);
   });
 });
