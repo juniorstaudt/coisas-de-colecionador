@@ -441,3 +441,17 @@
     }
   }
 }
+
+/* Google sign-in button: Google brand themes (light / dark) */
+.google-btn {
+  font-family: "Google Sans", var(--font-sans, sans-serif);
+  line-height: 20px;
+  background: #ffffff;
+  border-color: #747775;
+  color: #1f1f1f;
+}
+.dark .google-btn {
+  background: #131314;
+  border-color: #8e918f;
+  color: #e3e3e3;
+}

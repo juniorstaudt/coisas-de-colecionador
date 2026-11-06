@@ -4,6 +4,15 @@
 const DB_NAME = "colecionador";
 const STORE = "images";
 
+import { supabase } from "@/integrations/supabase/client";
+
+const BUCKET = "game-images";
+let cloudUserId: string | null = null;
+/** When set, photos are also kept in the signed-in person's cloud folder. */
+export function setCloudUser(id: string | null) {
+  cloudUserId = id;
+}
+
 let dbPromise: Promise<IDBDatabase> | null = null;
 const urlCache = new Map<string, string>();
 
@@ -57,7 +66,22 @@ export async function saveUploadedImage(file: File): Promise<string> {
   const blob = await compressImage(file);
   const id = crypto.randomUUID();
   await run("readwrite", (s) => s.put(blob, id));
+  if (cloudUserId) await uploadToCloud(id, blob);
   return id;
+}
+
+async function uploadToCloud(id: string, blob: Blob) {
+  if (!cloudUserId) return;
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(`${cloudUserId}/${id}`, blob, { upsert: true, contentType: blob.type || "image/jpeg" });
+  if (error) throw error;
+}
+
+/** Copies a photo kept on this device to the cloud (used when moving a local collection). */
+export async function pushImageToCloud(id: string): Promise<void> {
+  const blob = await run<Blob | undefined>("readonly", (s) => s.get(id) as IDBRequest<Blob | undefined>);
+  if (blob) await uploadToCloud(id, blob);
 }
 
 /** Object URL for a stored image (cached for the session). */
@@ -65,8 +89,16 @@ export async function getImageUrl(id: string): Promise<string | undefined> {
   const cached = urlCache.get(id);
   if (cached) return cached;
   const blob = await run<Blob | undefined>("readonly", (s) => s.get(id) as IDBRequest<Blob | undefined>);
-  if (!blob) return undefined;
-  const url = URL.createObjectURL(blob);
+  let found = blob;
+  if (!found && cloudUserId) {
+    const { data } = await supabase.storage.from(BUCKET).download(`${cloudUserId}/${id}`);
+    if (data) {
+      found = data;
+      await run("readwrite", (s) => s.put(data, id)).catch(() => undefined);
+    }
+  }
+  if (!found) return undefined;
+  const url = URL.createObjectURL(found);
   urlCache.set(id, url);
   return url;
 }
@@ -81,5 +113,8 @@ export async function deleteImages(ids: string[]): Promise<void> {
     if (url) URL.revokeObjectURL(url);
     urlCache.delete(id);
     await run("readwrite", (s) => s.delete(id));
+  }
+  if (cloudUserId && ids.length) {
+    await supabase.storage.from(BUCKET).remove(ids.map((id) => `${cloudUserId}/${id}`));
   }
 }
