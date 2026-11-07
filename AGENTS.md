@@ -31,8 +31,8 @@ use the editor.
 
 ## Project rules
 
-- The game collection is stored in the browser's localStorage under the original key `colecionador_jogos`, read/written only through `src/lib/games.ts` and `useGameCollection` (read after hydration). Why: preserves the original single-file app's per-browser storage and data shape; no login needed.
-- Uploaded photos (covers, gallery) are stored as blobs in IndexedDB via `src/lib/image-store.ts`; games keep only image ids, and removing a game or photo deletes its blobs. Why: localStorage is too small for images.
+- The game collection lives in localStorage (`colecionador_jogos`) when signed out, and in the user's own Supabase `games` table (jsonb `data`, RLS per user) when signed in with Google; `useGameCollection` picks the source and moves local games up on first sign-in when the cloud is empty. Why: login is optional and the data shape stays the same.
+- Uploaded photos (covers, gallery) are stored as blobs in IndexedDB via `src/lib/image-store.ts`, mirrored to the private `game-images` bucket under `<userId>/<imageId>` when signed in; games keep only image ids, and removing a game or photo deletes its blobs. Why: localStorage is too small for images.
 - Exchange rates come from the public Frankfurter API in the browser (`src/lib/exchange-rates.ts`), with fixed fallback rates in `src/lib/games.ts`. Prices are always stored in BRL. Why: no key needed, CORS-enabled, works offline with fallback.
 - Theme: `dark` class on <html> is the SSR default; an inline head script removes it when the visitor chose light (`src/hooks/use-theme.ts`). Why: avoids a light/dark flash on load.
 - Collection types are listed in `COLLECTION_KINDS`; new kinds (music, books) should get their own model module and route rather than overloading `Game`. Why: keeps each collection's fields independent.

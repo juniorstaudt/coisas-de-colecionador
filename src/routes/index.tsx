@@ -95,11 +95,11 @@ function Index() {
         <div className="absolute left-4 top-4 z-20">
           {!auth.checked ? null : auth.user ? (
             <div className="pixel-border flex items-center gap-2 rounded-full bg-card/90 py-1 pl-1 pr-1 backdrop-blur">
-              {auth.user.user_metadata?.avatar_url ? (
-                <img src={auth.user.user_metadata.avatar_url} alt="" className="size-7 rounded-full" referrerPolicy="no-referrer" />
+              {auth.user.user_metadata?.["avatar_url"] ? (
+                <img src={auth.user.user_metadata["avatar_url"]} alt="" className="size-7 rounded-full" referrerPolicy="no-referrer" />
               ) : null}
               <span className="hidden max-w-32 truncate text-xs font-bold sm:inline">
-                {auth.user.user_metadata?.full_name ?? auth.user.email} · ☁️
+                {auth.user.user_metadata?.["full_name"] ?? auth.user.email} · ☁️
               </span>
               <Button size="icon" variant="ghost" className="size-7" onClick={() => void auth.signOut()} aria-label="Sair">
                 <LogOut />
