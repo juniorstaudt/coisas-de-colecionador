@@ -46,6 +46,7 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "google-site-verification", content: "B5jI2MmTk_sI4BTOkJ9PfoluKY-8NUy3W99c6Qcf1Y0" },
     ],
   }),
   component: Index,
