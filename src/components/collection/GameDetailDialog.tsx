@@ -88,7 +88,7 @@ export function GameDetailDialog({ game, currency, rates, onClose, onEdit, onDel
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <Info label="Dificuldade">
                   <span className="text-tag-difficulty-foreground">
-                    {DIFFICULTIES.find((d) => d.value === game.difficulty)?.label ?? game.difficulty}
+                    {DIFFICULTIES.find((d) => d.value === game.difficulty)?.label ?? (game.difficulty || "—")}
                   </span>
                 </Info>
                 <Info label="Nota">
@@ -96,7 +96,7 @@ export function GameDetailDialog({ game, currency, rates, onClose, onEdit, onDel
                 </Info>
                 <Info label="Veredito">
                   <span className="text-tag-verdict-foreground">
-                    {VERDICTS.find((v) => v.value === game.verdict)?.label ?? game.verdict}
+                    {VERDICTS.find((v) => v.value === game.verdict)?.label ?? (game.verdict || "Sem veredito")}
                   </span>
                 </Info>
               </div>

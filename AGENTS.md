@@ -37,3 +37,4 @@ use the editor.
 - Theme: `dark` class on <html> is the SSR default; an inline head script removes it when the visitor chose light (`src/hooks/use-theme.ts`). Why: avoids a light/dark flash on load.
 - Collection types are listed in `COLLECTION_KINDS`; new kinds (music, books) should get their own model module and route rather than overloading `Game`. Why: keeps each collection's fields independent.
 - Collection business rules (currency rates, cost per hour, platinum, filters) live as pure functions in `src/lib/games.ts` with tests in `src/test/games.test.ts`. Why: keeps rules testable and separate from UI.
+- The owner's spreadsheet lives as generated data in `src/data/imported-games.json` (built with `src/lib/spreadsheet-import.ts`) and is merged once per browser into the local collection, guarded by a localStorage flag. Why: the owner wanted the games in without signing in; the existing first-sign-in move then carries them to the cloud.

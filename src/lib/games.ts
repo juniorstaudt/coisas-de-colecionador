@@ -22,6 +22,7 @@ export const COLLECTION_KINDS = [
 export const PLATFORMS = [
   { value: "PC", label: "PC" },
   { value: "PS5", label: "PS5" },
+  { value: "PS4", label: "PS4" },
   { value: "Switch", label: "Nintendo Switch" },
   { value: "Xbox", label: "Xbox" },
   { value: "Retrô", label: "Retrô / Outros" },
@@ -140,15 +141,19 @@ export function trophyProgress(game: Pick<Game, "trophiesUnlocked" | "trophiesTo
   return Math.min(100, Math.round((Number(game.trophiesUnlocked) / total) * 100));
 }
 
+/** Unrated games ("") show no stars. */
 export function starCount(stars: string): number {
+  if (stars === "") return 0;
   return Number(stars) || 5;
 }
 
 export function difficultyName(value: string): string {
+  if (!value) return "—";
   return DIFFICULTIES.find((d) => d.value === value)?.short ?? value;
 }
 
 export function verdictName(value: string): string {
+  if (!value) return "Sem veredito";
   return VERDICTS.find((v) => v.value === value)?.short ?? value;
 }
 

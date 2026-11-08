@@ -4,6 +4,19 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { imageIdsOf, loadGames, normalizeGame, saveGames, upsertGame, type Game } from "@/lib/games";
 import { deleteImages, pushImageToCloud } from "@/lib/image-store";
+import { IMPORT_FLAG_KEY, mergeImportedGames } from "@/lib/spreadsheet-import";
+import importedGames from "@/data/imported-games.json";
+
+/** This browser's games, with the owner's spreadsheet merged in once. */
+function loadLocalGames(): Game[] {
+  const storage = window.localStorage;
+  const local = loadGames(storage);
+  if (storage.getItem(IMPORT_FLAG_KEY)) return local;
+  const merged = mergeImportedGames(local, (importedGames as Partial<Game>[]).map(normalizeGame));
+  saveGames(storage, merged);
+  storage.setItem(IMPORT_FLAG_KEY, "1");
+  return merged;
+}
 
 /**
  * Signed out: collection stored in this browser (localStorage + IndexedDB photos).
@@ -19,7 +32,7 @@ export function useGameCollection(userId: string | null, authChecked: boolean) {
     let cancelled = false;
     setReady(false);
     if (!userId) {
-      setGames(loadGames(window.localStorage));
+      setGames(loadLocalGames());
       setReady(true);
       return;
     }
@@ -33,7 +46,7 @@ export function useGameCollection(userId: string | null, authChecked: boolean) {
       }
       let list = (data ?? []).map((r) => normalizeGame({ ...(r.data as Partial<Game>), id: r.id }));
       if (list.length === 0) {
-        const local = loadGames(window.localStorage);
+        const local = loadLocalGames();
         if (local.length) {
           for (const g of local) for (const id of imageIdsOf(g)) await pushImageToCloud(id).catch(() => undefined);
           const { error: upErr } = await supabase
