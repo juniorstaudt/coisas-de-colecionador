@@ -1,15 +1,12 @@
 // Game collection model and rules for "Coisas de Colecionador".
 
-export type Currency = "BRL" | "USD" | "EUR";
-export type Rates = Record<Currency, number>;
+/** Currency a game was bought in; prices are kept exactly as paid, never converted. */
+export type Currency = "BRL" | "EUR";
 
-/** Used until (or when) live exchange rates can't be fetched. */
-export const FALLBACK_RATES: Rates = { BRL: 1, USD: 0.18, EUR: 0.17 };
-export const SYMBOLS: Record<Currency, string> = { BRL: "R$", USD: "$", EUR: "€" };
+export const SYMBOLS: Record<Currency, string> = { BRL: "R$", EUR: "€" };
 export const CURRENCIES: { value: Currency; label: string }[] = [
-  { value: "BRL", label: "R$ BRL" },
-  { value: "USD", label: "$ USD" },
-  { value: "EUR", label: "€ EUR" },
+  { value: "BRL", label: "R$ (Real)" },
+  { value: "EUR", label: "€ (Euro)" },
 ];
 
 /** Collection types. Only games exist today; music and books are planned. */
@@ -63,8 +60,9 @@ export interface Game {
   genre: string;
   studio: string;
   publisher: string;
-  /** Purchase price, always stored in BRL. */
+  /** Amount paid, in `currency`. */
   price: number;
+  currency: Currency;
   purchaseDate: string;
   hoursPlayed: number;
   status: string;
@@ -96,6 +94,7 @@ export const SEED_GAMES: Game[] = [
     studio: "FromSoftware",
     publisher: "Bandai Namco",
     price: 299.9,
+    currency: "BRL",
     purchaseDate: "2022-02-25",
     hoursPlayed: 120,
     status: "Zerado",
@@ -112,15 +111,28 @@ export const SEED_GAMES: Game[] = [
   },
 ];
 
-/** Converts a BRL amount to the chosen currency. Missing values read "Grátis"; 0 is shown as a price. */
-export function formatPrice(
-  value: number | null | undefined,
-  currency: Currency,
-  rates: Rates = FALLBACK_RATES,
-): string {
+const NUMBER = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/** "R$ 1.299,90" / "€ 59,49". Missing values read "Grátis"; 0 is shown as a price. */
+export function formatPrice(value: number | null | undefined, currency: Currency): string {
   if (value === null || value === undefined || Number.isNaN(value)) return "Grátis";
-  const converted = value * rates[currency];
-  return `${SYMBOLS[currency]} ${converted.toFixed(2)}`;
+  return `${SYMBOLS[currency]} ${NUMBER.format(value)}`;
+}
+
+export interface CurrencyTotal {
+  currency: Currency;
+  total: number;
+  /** Games bought in this currency with a price above zero. */
+  count: number;
+}
+
+/** Sum of what was paid, per purchase currency (no conversion between them). */
+export function collectionTotals(games: Pick<Game, "price" | "currency">[]): CurrencyTotal[] {
+  return CURRENCIES.map(({ value }) => {
+    const paid = games.filter((g) => g.currency === value && g.price > 0);
+    const total = Math.round(paid.reduce((sum, g) => sum + g.price, 0) * 100) / 100;
+    return { currency: value, total, count: paid.length };
+  });
 }
 
 /** Price divided by hours played; with no hours, the full price. */
@@ -207,6 +219,7 @@ export function normalizeGame(raw: Partial<Game>): Game {
     studio: raw.studio ?? "",
     publisher: raw.publisher ?? "",
     price: Number(raw.price) || 0,
+    currency: raw.currency === "EUR" ? "EUR" : "BRL",
     purchaseDate: raw.purchaseDate ?? "",
     hoursPlayed: Number(raw.hoursPlayed) || 0,
     status: raw.status ?? "Na Fila",

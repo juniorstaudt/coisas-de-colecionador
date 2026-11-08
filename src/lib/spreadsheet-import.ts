@@ -4,11 +4,10 @@ import { SEED_GAMES, normalizeGame, type Game } from "@/lib/games";
 
 export type SpreadsheetRow = Record<string, string | undefined>;
 
-/** Euro → real rate used when the spreadsheet was imported (Frankfurter, 2026-11-06). */
-export const IMPORT_EUR_TO_BRL = 6.1449;
-
 /** localStorage flag so the spreadsheet is merged only once per browser. */
 export const IMPORT_FLAG_KEY = "colecionador_import_planilha_v1";
+/** Set once spreadsheet games got back their original currency (they were first saved converted to R$). */
+export const CURRENCY_FIX_FLAG_KEY = "colecionador_moeda_original_v1";
 
 const PLATFORM_MAP: Record<string, string> = {
   "playstation 5": "PS5",
@@ -58,15 +57,14 @@ function slug(text: string): string {
     .replace(/^-|-$/g, "");
 }
 
-/** One spreadsheet row → game; rows without a title or platform are skipped. Prices end up in BRL. */
-export function gameFromSpreadsheetRow(row: SpreadsheetRow, eurToBrl = IMPORT_EUR_TO_BRL): Game | null {
+/** One spreadsheet row → game; rows without a title or platform are skipped. Prices stay in the currency paid. */
+export function gameFromSpreadsheetRow(row: SpreadsheetRow): Game | null {
   const title = cell(row, "Game");
   const platformRaw = cell(row, "Platform");
   if (!title || !platformRaw) return null;
 
-  const cost = spreadsheetNumber(cell(row, "Cost"));
-  const isEuro = cell(row, "Currency") === "€";
-  const price = Math.round((isEuro ? cost * eurToBrl : cost) * 100) / 100;
+  const price = spreadsheetNumber(cell(row, "Cost"));
+  const currency = cell(row, "Currency") === "€" ? "EUR" : "BRL";
 
   const hours = spreadsheetNumber(cell(row, "Gameplay (h)"));
   const trophies = Math.min(100, Math.round(spreadsheetNumber(cell(row, "Trophies %").replace("%", ""))));
@@ -78,7 +76,6 @@ export function gameFromSpreadsheetRow(row: SpreadsheetRow, eurToBrl = IMPORT_EU
 
   const notes: string[] = [];
   if (beaten) notes.push(`Zerado em ${beaten.split("-").reverse().join("/")}.`);
-  if (isEuro && cost > 0) notes.push(`Preço pago: € ${cost.toFixed(2).replace(".", ",")}.`);
 
   return normalizeGame({
     id: `planilha-${slug(title)}`,
@@ -88,6 +85,7 @@ export function gameFromSpreadsheetRow(row: SpreadsheetRow, eurToBrl = IMPORT_EU
     studio: cell(row, "Studio"),
     publisher: cell(row, "Publisher"),
     price,
+    currency,
     purchaseDate: spreadsheetDate(cell(row, "Bought in")),
     hoursPlayed: hours,
     status,
@@ -112,4 +110,17 @@ export function mergeImportedGames(games: Game[], imported: Game[]): Game[] {
   );
   const ids = new Set(kept.map((g) => g.id));
   return [...kept, ...imported.filter((g) => !ids.has(g.id))];
+}
+
+/** Puts back the paid amount and currency on spreadsheet games saved before currencies were kept. */
+export function restoreOriginalCurrencies(games: Game[], imported: Game[]): Game[] {
+  const byId = new Map(imported.map((g) => [g.id, g]));
+  return games.map((g) => {
+    const source = byId.get(g.id);
+    return source ? { ...g, price: source.price, currency: source.currency, review: stripPaidNote(g.review) } : g;
+  });
+}
+
+function stripPaidNote(review: string): string {
+  return review.replace(/\s*Preço pago: € [\d.,]+\./, "").trim();
 }

@@ -9,21 +9,17 @@ import {
   isPlatinum,
   starCount,
   verdictName,
-  type Currency,
   type Game,
-  type Rates,
 } from "@/lib/games";
 
 interface GameCardProps {
   game: Game;
-  currency: Currency;
-  rates: Rates;
   onOpen: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-export function GameCard({ game, currency, rates, onOpen, onEdit, onDelete }: GameCardProps) {
+export function GameCard({ game, onOpen, onEdit, onDelete }: GameCardProps) {
   return (
     <article className="pixel-border group flex flex-col justify-between overflow-hidden rounded-2xl bg-card text-card-foreground transition duration-200 hover:-translate-y-1">
       <button
@@ -70,8 +66,8 @@ export function GameCard({ game, currency, rates, onOpen, onEdit, onDelete }: Ga
           </p>
 
           <div className="mb-3 grid grid-cols-2 gap-2 rounded-xl bg-muted p-3 text-xs">
-            <Stat label="Preço" value={formatPrice(game.price, currency, rates)} />
-            <Stat label="Custo/Hora" value={`${formatPrice(costPerHour(game), currency, rates)}/h`} />
+            <Stat label="Preço" value={formatPrice(game.price, game.currency)} />
+            <Stat label="Custo/Hora" value={`${formatPrice(costPerHour(game), game.currency)}/h`} />
             <Stat label="Horas" value={`${game.hoursPlayed || 0}h`} />
             <Stat label="Troféus" value={`${game.trophiesUnlocked || 0}/${game.trophiesTotal || 0}`} />
           </div>

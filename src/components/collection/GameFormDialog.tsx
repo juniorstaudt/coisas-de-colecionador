@@ -6,12 +6,14 @@ import { GameCover, StoredImage } from "@/components/collection/media";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import {
+  CURRENCIES,
   DIFFICULTIES,
   PLATFORMS,
   STAR_OPTIONS,
   STATUSES,
   VERDICTS,
   normalizeGame,
+  type Currency,
   type Game,
 } from "@/lib/games";
 import { deleteImages, saveUploadedImage } from "@/lib/image-store";
@@ -23,6 +25,7 @@ interface FormState {
   studio: string;
   publisher: string;
   price: string;
+  currency: Currency;
   purchaseDate: string;
   hoursPlayed: string;
   status: string;
@@ -45,6 +48,7 @@ const EMPTY: FormState = {
   studio: "",
   publisher: "",
   price: "",
+  currency: "BRL",
   purchaseDate: "",
   hoursPlayed: "",
   status: STATUSES[0],
@@ -69,6 +73,7 @@ function fromGame(g: Game): FormState {
     studio: g.studio || "",
     publisher: g.publisher || "",
     price: num(g.price),
+    currency: g.currency,
     purchaseDate: g.purchaseDate || "",
     hoursPlayed: num(g.hoursPlayed),
     status: g.status,
@@ -148,6 +153,7 @@ export function GameFormDialog({ open, game, onOpenChange, onSave }: GameFormDia
         studio: form.studio,
         publisher: form.publisher,
         price: parseFloat(form.price) || 0,
+        currency: form.currency,
         purchaseDate: form.purchaseDate,
         hoursPlayed: parseFloat(form.hoursPlayed) || 0,
         status: form.status,
@@ -245,8 +251,20 @@ export function GameFormDialog({ open, game, onOpenChange, onSave }: GameFormDia
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <Field label="Preço Pago (R$)" htmlFor="price">
-              <input id="price" type="number" min="0" step="0.01" placeholder="0.00" value={form.price} onChange={set("price")} className="field" />
+            <Field label="Preço Pago" htmlFor="price">
+              <div className="flex gap-2">
+                <select
+                  aria-label="Moeda da compra"
+                  value={form.currency}
+                  onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value as Currency }))}
+                  className="field w-24 shrink-0"
+                >
+                  {CURRENCIES.map((c) => (
+                    <option key={c.value} value={c.value}>{c.value === "BRL" ? "R$" : "€"}</option>
+                  ))}
+                </select>
+                <input id="price" type="number" min="0" step="0.01" placeholder="0.00" value={form.price} onChange={set("price")} className="field min-w-0 flex-1" />
+              </div>
             </Field>
             <Field label="Data de Compra" htmlFor="purchaseDate">
               <input id="purchaseDate" type="date" value={form.purchaseDate} onChange={set("purchaseDate")} className="field" />

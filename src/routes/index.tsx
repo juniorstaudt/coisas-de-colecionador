@@ -17,24 +17,21 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useExchangeRates } from "@/hooks/use-exchange-rates";
 import { useGameCollection } from "@/hooks/use-game-collection";
 import { useTheme } from "@/hooks/use-theme";
 import {
   COLLECTION_KINDS,
-  CURRENCIES,
   PLATFORMS,
   STATUSES,
-  SYMBOLS,
+  collectionTotals,
   filterGames,
-  formatDate,
-  type Currency,
+  formatPrice,
   type Game,
 } from "@/lib/games";
 
 const TITLE = "Coisas de Colecionador - Catálogo de Jogos";
 const DESCRIPTION =
-  "Sua coleção de jogos em estilo pixel art: preço em R$, $ ou €, custo por hora, troféus e platina, dificuldade, veredito, review, trailer e galeria de fotos.";
+  "Sua coleção de jogos em estilo pixel art: total gasto em R$ e €, custo por hora, troféus e platina, dificuldade, veredito, review, trailer e galeria de fotos.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -53,9 +50,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { games, ready, save, remove } = useGameCollection();
-  const { rates, live, date, checking } = useExchangeRates();
   const { theme, toggle } = useTheme();
-  const [currency, setCurrency] = useState<Currency>("BRL");
   const [search, setSearch] = useState("");
   const [platform, setPlatform] = useState("");
   const [status, setStatus] = useState("");
@@ -68,6 +63,7 @@ function Index() {
     () => filterGames(games, { search, platform, status }),
     [games, search, platform, status],
   );
+  const totals = useMemo(() => collectionTotals(games), [games]);
   const viewing = games.find((g) => g.id === viewingId) ?? null;
 
   function openForm(game: Game | null) {
@@ -119,30 +115,22 @@ function Index() {
             )}
           </nav>
 
-          <div className="pixel-border relative flex flex-col items-center gap-2 rounded-2xl bg-card/90 px-4 py-2.5 backdrop-blur sm:flex-row sm:gap-4 sm:rounded-full sm:px-6">
-            <span className="text-xs font-bold uppercase text-muted-foreground">Moeda:</span>
-            <div className="flex gap-2" role="group" aria-label="Moeda">
-              {CURRENCIES.map((c) => (
-                <Button
-                  key={c.value}
-                  size="chip"
-                  variant={currency === c.value ? "default" : "secondary"}
-                  aria-pressed={currency === c.value}
-                  onClick={() => setCurrency(c.value)}
-                >
-                  {c.label}
-                </Button>
-              ))}
-            </div>
+          <div
+            className="pixel-border relative flex flex-col items-center gap-2 rounded-2xl bg-card/90 px-4 py-2.5 backdrop-blur sm:flex-row sm:gap-5 sm:rounded-full sm:px-6"
+            aria-label="Valor total da coleção"
+          >
+            <span className="text-xs font-bold uppercase text-muted-foreground">Total da coleção:</span>
+            {totals.map((t) => (
+              <span key={t.currency} className="flex items-baseline gap-1.5">
+                <strong className="text-base font-extrabold">{ready ? formatPrice(t.total, t.currency) : "…"}</strong>
+                {ready && (
+                  <span className="text-[11px] font-semibold text-muted-foreground">
+                    {t.count} {t.count === 1 ? "jogo" : "jogos"}
+                  </span>
+                )}
+              </span>
+            ))}
           </div>
-          <p className="relative mt-3 flex items-center gap-2 rounded-full bg-card/70 px-3 py-1 text-[11px] font-semibold text-muted-foreground backdrop-blur">
-            <span className={`size-2 rounded-full ${live ? "animate-pulse bg-live" : "bg-muted-foreground"}`} aria-hidden />
-            {checking
-              ? "Buscando cotação…"
-              : live
-                ? `Cotação ao vivo · R$ 1 = ${SYMBOLS.USD} ${rates.USD.toFixed(4)} · ${SYMBOLS.EUR} ${rates.EUR.toFixed(4)} · ${formatDate(date)}`
-                : "Sem conexão: usando cotação estimada"}
-          </p>
         </div>
       </header>
 
@@ -202,8 +190,6 @@ function Index() {
                   <GameCard
                     key={game.id}
                     game={game}
-                    currency={currency}
-                    rates={rates}
                     onOpen={() => setViewingId(game.id)}
                     onEdit={() => openForm(game)}
                     onDelete={() => setDeleting(game)}
@@ -219,8 +205,6 @@ function Index() {
 
       <GameDetailDialog
         game={viewing}
-        currency={currency}
-        rates={rates}
         onClose={() => setViewingId(null)}
         onEdit={openForm}
         onDelete={(g) => setDeleting(g)}

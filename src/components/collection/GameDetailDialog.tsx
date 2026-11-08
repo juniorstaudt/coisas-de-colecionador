@@ -19,21 +19,17 @@ import {
   isPlatinum,
   starCount,
   trophyProgress,
-  type Currency,
   type Game,
-  type Rates,
 } from "@/lib/games";
 
 interface GameDetailDialogProps {
   game: Game | null;
-  currency: Currency;
-  rates: Rates;
   onClose: () => void;
   onEdit: (game: Game) => void;
   onDelete: (game: Game) => void;
 }
 
-export function GameDetailDialog({ game, currency, rates, onClose, onEdit, onDelete }: GameDetailDialogProps) {
+export function GameDetailDialog({ game, onClose, onEdit, onDelete }: GameDetailDialogProps) {
   const [photo, setPhoto] = useState<string | null>(null);
   useEffect(() => setPhoto(null), [game?.id]);
 
@@ -67,8 +63,8 @@ export function GameDetailDialog({ game, currency, rates, onClose, onEdit, onDel
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <Info label="Preço pago">{formatPrice(game.price, currency, rates)}</Info>
-                <Info label="Custo por hora">{formatPrice(costPerHour(game), currency, rates)}/h</Info>
+                <Info label="Preço pago">{formatPrice(game.price, game.currency)}</Info>
+                <Info label="Custo por hora">{formatPrice(costPerHour(game), game.currency)}/h</Info>
                 <Info label="Horas jogadas">{game.hoursPlayed || 0}h</Info>
                 <Info label="Data de compra">{formatDate(game.purchaseDate)}</Info>
               </div>

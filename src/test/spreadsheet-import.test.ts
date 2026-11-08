@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { SEED_GAMES, starCount } from "@/lib/games";
-import { gameFromSpreadsheetRow, mergeImportedGames, spreadsheetDate } from "@/lib/spreadsheet-import";
+import imported from "@/data/imported-games.json";
+import { SEED_GAMES, collectionTotals, starCount } from "@/lib/games";
+import {
+  gameFromSpreadsheetRow,
+  mergeImportedGames,
+  restoreOriginalCurrencies,
+  spreadsheetDate,
+} from "@/lib/spreadsheet-import";
 
 const row = {
   Game: "Astro Bot",
@@ -21,11 +27,22 @@ const row = {
 };
 
 describe("spreadsheet import", () => {
-  it("converts euro prices to BRL at the import rate", () => {
-    expect(gameFromSpreadsheetRow(row, 6)?.price).toBe(356.94);
+  it("keeps euro prices in euros", () => {
+    const g = gameFromSpreadsheetRow(row);
+    expect([g?.price, g?.currency]).toEqual([59.49, "EUR"]);
   });
-  it("keeps real prices as they are", () => {
-    expect(gameFromSpreadsheetRow({ ...row, Currency: "R$", Cost: "299,9" })?.price).toBe(299.9);
+  it("keeps real prices in reais", () => {
+    const g = gameFromSpreadsheetRow({ ...row, Currency: "R$", Cost: "299,9" });
+    expect([g?.price, g?.currency]).toEqual([299.9, "BRL"]);
+  });
+  it("matches the spreadsheet totals: R$ 3599,87 and € 3707,23", () => {
+    expect(collectionTotals(imported as never).map((t) => t.total)).toEqual([3599.87, 3707.23]);
+  });
+  it("restores euro prices on games saved converted to reais", () => {
+    const original = gameFromSpreadsheetRow(row)!;
+    const converted = { ...original, price: 365.56, currency: "BRL" as const, review: "Zerado em 09/11/2024. Preço pago: € 59,49." };
+    const [fixed] = restoreOriginalCurrencies([converted], [original]);
+    expect([fixed?.price, fixed?.currency, fixed?.review]).toEqual([59.49, "EUR", "Zerado em 09/11/2024."]);
   });
   it("reads FREE as price 0", () => {
     expect(gameFromSpreadsheetRow({ ...row, Cost: "FREE" })?.price).toBe(0);

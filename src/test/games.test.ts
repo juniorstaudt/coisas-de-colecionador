@@ -1,8 +1,8 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { fetchLiveRates } from "@/lib/exchange-rates";
 import {
   SEED_GAMES,
+  collectionTotals,
   STORAGE_KEY,
   costPerHour,
   filterGames,
@@ -11,6 +11,7 @@ import {
   imageIdsOf,
   isPlatinum,
   loadGames,
+  normalizeGame,
   upsertGame,
   youtubeId,
   type Game,
@@ -28,41 +29,33 @@ function memoryStorage(initial: Record<string, string> = {}) {
   };
 }
 
-describe("currency conversion", () => {
-  it("shows BRL prices unchanged", () => {
-    expect(formatPrice(299.9, "BRL")).toBe("R$ 299.90");
+describe("prices in the currency paid", () => {
+  it("shows reais with Brazilian formatting", () => {
+    expect(formatPrice(1299.9, "BRL")).toBe("R$ 1.299,90");
   });
-  it("falls back to USD at 0.18 without live rates", () => {
-    expect(formatPrice(100, "USD")).toBe("$ 18.00");
-  });
-  it("falls back to EUR at 0.17 without live rates", () => {
-    expect(formatPrice(100, "EUR")).toBe("€ 17.00");
-  });
-  it("uses live rates when provided", () => {
-    expect(formatPrice(100, "USD", { BRL: 1, USD: 0.2, EUR: 0.16 })).toBe("$ 20.00");
+  it("shows euros without converting", () => {
+    expect(formatPrice(59.49, "EUR")).toBe("€ 59,49");
   });
   it("shows Grátis when there is no price", () => {
     expect(formatPrice(undefined, "BRL")).toBe("Grátis");
   });
+  it("treats games saved without a currency as reais", () => {
+    expect(normalizeGame({ title: "Old", price: 10 }).currency).toBe("BRL");
+  });
 });
 
-describe("live exchange rates", () => {
-  afterEach(() => vi.unstubAllGlobals());
-
-  it("reads BRL→USD/EUR from the rate service", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => new Response(JSON.stringify({ date: "2026-11-05", rates: { USD: 0.183, EUR: 0.163 } }))),
-    );
-    await expect(fetchLiveRates()).resolves.toEqual({
-      rates: { BRL: 1, USD: 0.183, EUR: 0.163 },
-      date: "2026-11-05",
-    });
+describe("collection totals", () => {
+  const games = [
+    { price: 299.9, currency: "BRL" as const },
+    { price: 100, currency: "BRL" as const },
+    { price: 59.49, currency: "EUR" as const },
+    { price: 0, currency: "BRL" as const },
+  ];
+  it("sums what was paid in reais", () => {
+    expect(collectionTotals(games)[0]).toEqual({ currency: "BRL", total: 399.9, count: 2 });
   });
-
-  it("fails when the service is down so the fallback is used", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => new Response("", { status: 503 })));
-    await expect(fetchLiveRates()).rejects.toThrow();
+  it("sums what was paid in euros separately", () => {
+    expect(collectionTotals(games)[1]).toEqual({ currency: "EUR", total: 59.49, count: 1 });
   });
 });
 
