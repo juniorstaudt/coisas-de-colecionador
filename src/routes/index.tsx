@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LogOut, Moon, PlusCircle, Sun } from "lucide-react";
+import { Moon, PlusCircle, Sun } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { GameCard } from "@/components/collection/GameCard";
@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useExchangeRates } from "@/hooks/use-exchange-rates";
-import { useAuth } from "@/hooks/use-auth";
 import { useGameCollection } from "@/hooks/use-game-collection";
 import { useTheme } from "@/hooks/use-theme";
 import {
@@ -53,8 +52,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const auth = useAuth();
-  const { games, ready, save, remove } = useGameCollection(auth.user?.id ?? null, auth.checked);
+  const { games, ready, save, remove } = useGameCollection();
   const { rates, live, date, checking } = useExchangeRates();
   const { theme, toggle } = useTheme();
   const [currency, setCurrency] = useState<Currency>("BRL");
@@ -92,31 +90,6 @@ function Index() {
         >
           {theme === "dark" ? <Sun /> : <Moon />}
         </Button>
-
-        <div className="absolute left-4 top-4 z-20">
-          {!auth.checked ? null : auth.user ? (
-            <div className="pixel-border flex items-center gap-2 rounded-full bg-card/90 py-1 pl-1 pr-1 backdrop-blur">
-              {auth.user.user_metadata?.["avatar_url"] ? (
-                <img src={auth.user.user_metadata["avatar_url"]} alt="" className="size-7 rounded-full" referrerPolicy="no-referrer" />
-              ) : null}
-              <span className="hidden max-w-32 truncate text-xs font-bold sm:inline">
-                {auth.user.user_metadata?.["full_name"] ?? auth.user.email} · ☁️
-              </span>
-              <Button size="icon" variant="ghost" className="size-7" onClick={() => void auth.signOut()} aria-label="Sair">
-                <LogOut />
-              </Button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => void auth.signIn()}
-              className="google-btn inline-flex items-center gap-[10px] rounded-full border py-2 pl-3 pr-3 text-sm font-medium"
-            >
-              <svg aria-hidden="true" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-              Entrar com Google
-            </button>
-          )}
-        </div>
 
         <div className="relative mx-auto flex max-w-5xl flex-col items-center">
           <div className="sun-glow pointer-events-none absolute -top-16 left-1/2 size-[26rem] -translate-x-1/2" aria-hidden />

@@ -31,10 +31,10 @@ use the editor.
 
 ## Project rules
 
-- The game collection lives in localStorage (`colecionador_jogos`) when signed out, and in the user's own Supabase `games` table (jsonb `data`, RLS per user) when signed in with Google; `useGameCollection` picks the source and moves local games up on first sign-in when the cloud is empty. Why: login is optional and the data shape stays the same.
-- Uploaded photos (covers, gallery) are stored as blobs in IndexedDB via `src/lib/image-store.ts`, mirrored to the private `game-images` bucket under `<userId>/<imageId>` when signed in; games keep only image ids, and removing a game or photo deletes its blobs. Why: localStorage is too small for images.
+- The game collection lives only in this browser's localStorage (`colecionador_jogos`) via `useGameCollection`; there is no login and the app does not read or write Supabase (the old `games` table and `game-images` bucket are unused). Why: single-owner personal catalog, owner dropped login.
+- Uploaded photos (covers, gallery) are stored as blobs in IndexedDB via `src/lib/image-store.ts`; games keep only image ids, and removing a game or photo deletes its blobs. Why: localStorage is too small for images.
 - Exchange rates come from the public Frankfurter API in the browser (`src/lib/exchange-rates.ts`), with fixed fallback rates in `src/lib/games.ts`. Prices are always stored in BRL. Why: no key needed, CORS-enabled, works offline with fallback.
 - Theme: `dark` class on <html> is the SSR default; an inline head script removes it when the visitor chose light (`src/hooks/use-theme.ts`). Why: avoids a light/dark flash on load.
 - Collection types are listed in `COLLECTION_KINDS`; new kinds (music, books) should get their own model module and route rather than overloading `Game`. Why: keeps each collection's fields independent.
 - Collection business rules (currency rates, cost per hour, platinum, filters) live as pure functions in `src/lib/games.ts` with tests in `src/test/games.test.ts`. Why: keeps rules testable and separate from UI.
-- The owner's spreadsheet lives as generated data in `src/data/imported-games.json` (built with `src/lib/spreadsheet-import.ts`) and is merged once per browser into the local collection, guarded by a localStorage flag. Why: the owner wanted the games in without signing in; the existing first-sign-in move then carries them to the cloud.
+- The owner's spreadsheet lives as generated data in `src/data/imported-games.json` (built with `src/lib/spreadsheet-import.ts`) and is merged once per browser into the local collection, guarded by a localStorage flag. Why: the owner wanted the games in without signing in.

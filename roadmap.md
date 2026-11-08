@@ -12,4 +12,4 @@
 - [x] Verdict label "Cinema" = Jogo da vida / Obra de arte
 - [x] Structure ready to add music and books later ("em breve" tabs)
 - [x] Responsive check (mobile + desktop)
-- [ ] Optional later: sync to Lovable Cloud with login (only if the user asks)
+- [x] Google login and cloud sync removed (owner-only catalog, kept in the browser)
