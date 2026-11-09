@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { GameCard } from "@/components/collection/GameCard";
 import { GameDetailDialog } from "@/components/collection/GameDetailDialog";
 import { GameFormDialog } from "@/components/collection/GameFormDialog";
+import { OwnerLock } from "@/components/collection/OwnerLock";
 import { PixelFooter } from "@/components/layout/PixelFooter";
 import {
   AlertDialog,
@@ -28,6 +29,7 @@ import {
   formatPrice,
   type Game,
 } from "@/lib/games";
+import { getOwnerStatus } from "@/lib/owner.functions";
 
 const TITLE = "Coisas de Colecionador - Catálogo de Jogos";
 const DESCRIPTION =
@@ -45,10 +47,12 @@ export const Route = createFileRoute("/")({
       { name: "google-site-verification", content: "B5jI2MmTk_sI4BTOkJ9PfoluKY-8NUy3W99c6Qcf1Y0" },
     ],
   }),
+  loader: () => getOwnerStatus(),
   component: Index,
 });
 
 function Index() {
+  const { owner } = Route.useLoaderData();
   const { games, ready, save, remove } = useGameCollection();
   const { theme, toggle } = useTheme();
   const [search, setSearch] = useState("");
@@ -86,6 +90,7 @@ function Index() {
         >
           {theme === "dark" ? <Sun /> : <Moon />}
         </Button>
+        <OwnerLock owner={owner} />
 
         <div className="relative mx-auto flex max-w-5xl flex-col items-center">
           <div className="sun-glow pointer-events-none absolute -top-16 left-1/2 size-[26rem] -translate-x-1/2" aria-hidden />
@@ -169,9 +174,11 @@ function Index() {
             </select>
           </div>
 
-          <Button variant="arcade" size="xl" onClick={() => openForm(null)} className="w-full md:w-auto">
-            <PlusCircle /> Adicionar Jogo
-          </Button>
+          {owner && (
+            <Button variant="arcade" size="xl" onClick={() => openForm(null)} className="w-full md:w-auto">
+              <PlusCircle /> Adicionar Jogo
+            </Button>
+          )}
         </div>
 
         {ready && (
@@ -191,8 +198,8 @@ function Index() {
                     key={game.id}
                     game={game}
                     onOpen={() => setViewingId(game.id)}
-                    onEdit={() => openForm(game)}
-                    onDelete={() => setDeleting(game)}
+                    onEdit={owner ? () => openForm(game) : undefined}
+                    onDelete={owner ? () => setDeleting(game) : undefined}
                   />
                 ))
               )}
@@ -206,12 +213,12 @@ function Index() {
       <GameDetailDialog
         game={viewing}
         onClose={() => setViewingId(null)}
-        onEdit={openForm}
-        onDelete={(g) => setDeleting(g)}
+        onEdit={owner ? openForm : undefined}
+        onDelete={owner ? (g) => setDeleting(g) : undefined}
       />
 
       <GameFormDialog
-        open={formOpen}
+        open={owner && formOpen}
         game={editing}
         onOpenChange={setFormOpen}
         onSave={(game) => {
@@ -220,7 +227,7 @@ function Index() {
         }}
       />
 
-      <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
+      <AlertDialog open={owner && !!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
         <AlertDialogContent className="pixel-border rounded-2xl bg-card">
           <AlertDialogHeader>
             <AlertDialogTitle>Remover jogo?</AlertDialogTitle>

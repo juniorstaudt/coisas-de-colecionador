@@ -15,8 +15,9 @@ import {
 interface GameCardProps {
   game: Game;
   onOpen: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  /** Omitted outside owner mode: the edit/delete buttons are hidden. */
+  onEdit?: (() => void) | undefined;
+  onDelete?: (() => void) | undefined;
 }
 
 export function GameCard({ game, onOpen, onEdit, onDelete }: GameCardProps) {
@@ -29,7 +30,10 @@ export function GameCard({ game, onOpen, onEdit, onDelete }: GameCardProps) {
         aria-label={`Ver detalhes de ${game.title}`}
       >
         <div className="relative h-48 overflow-hidden bg-muted">
-          <GameCover game={game} className="h-full w-full transition duration-300 group-hover:scale-105" />
+          <GameCover
+            game={game}
+            className="h-full w-full transition duration-300 group-hover:scale-105"
+          />
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
             <span className="rounded-lg bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground shadow">
               {game.platform}
@@ -69,7 +73,10 @@ export function GameCard({ game, onOpen, onEdit, onDelete }: GameCardProps) {
             <Stat label="Preço" value={formatPrice(game.price, game.currency)} />
             <Stat label="Custo/Hora" value={`${formatPrice(costPerHour(game), game.currency)}/h`} />
             <Stat label="Horas" value={`${game.hoursPlayed || 0}h`} />
-            <Stat label="Troféus" value={`${game.trophiesUnlocked || 0}/${game.trophiesTotal || 0}`} />
+            <Stat
+              label="Troféus"
+              value={`${game.trophiesUnlocked || 0}/${game.trophiesTotal || 0}`}
+            />
           </div>
 
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -89,14 +96,21 @@ export function GameCard({ game, onOpen, onEdit, onDelete }: GameCardProps) {
 
       <div className="flex items-center justify-between border-t-2 border-border bg-muted p-4">
         <StarRating stars={starCount(game.stars)} />
-        <div className="flex gap-2">
-          <Button variant="tool" size="icon" onClick={onEdit} aria-label={`Editar ${game.title}`}>
-            <Pencil />
-          </Button>
-          <Button variant="danger-soft" size="icon" onClick={onDelete} aria-label={`Remover ${game.title}`}>
-            <Trash2 />
-          </Button>
-        </div>
+        {onEdit && onDelete && (
+          <div className="flex gap-2">
+            <Button variant="tool" size="icon" onClick={onEdit} aria-label={`Editar ${game.title}`}>
+              <Pencil />
+            </Button>
+            <Button
+              variant="danger-soft"
+              size="icon"
+              onClick={onDelete}
+              aria-label={`Remover ${game.title}`}
+            >
+              <Trash2 />
+            </Button>
+          </div>
+        )}
       </div>
     </article>
   );

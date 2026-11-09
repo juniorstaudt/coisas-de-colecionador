@@ -25,8 +25,9 @@ import {
 interface GameDetailDialogProps {
   game: Game | null;
   onClose: () => void;
-  onEdit: (game: Game) => void;
-  onDelete: (game: Game) => void;
+  /** Omitted outside owner mode: the edit/delete buttons are hidden. */
+  onEdit?: ((game: Game) => void) | undefined;
+  onDelete?: ((game: Game) => void) | undefined;
 }
 
 export function GameDetailDialog({ game, onClose, onEdit, onDelete }: GameDetailDialogProps) {
@@ -54,9 +55,12 @@ export function GameDetailDialog({ game, onClose, onEdit, onDelete }: GameDetail
             <div className="space-y-6 p-5 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <DialogTitle className="text-2xl font-extrabold leading-tight">{game.title}</DialogTitle>
+                  <DialogTitle className="text-2xl font-extrabold leading-tight">
+                    {game.title}
+                  </DialogTitle>
                   <DialogDescription className="mt-1 text-sm font-semibold text-muted-foreground">
-                    {[game.genre, game.studio, game.publisher].filter(Boolean).join(" • ") || "Sem detalhes"}
+                    {[game.genre, game.studio, game.publisher].filter(Boolean).join(" • ") ||
+                      "Sem detalhes"}
                   </DialogDescription>
                 </div>
                 {isPlatinum(game) && <PlatinumSeal size="lg" />}
@@ -64,7 +68,9 @@ export function GameDetailDialog({ game, onClose, onEdit, onDelete }: GameDetail
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <Info label="Preço pago">{formatPrice(game.price, game.currency)}</Info>
-                <Info label="Custo por hora">{formatPrice(costPerHour(game), game.currency)}/h</Info>
+                <Info label="Custo por hora">
+                  {formatPrice(costPerHour(game), game.currency)}/h
+                </Info>
                 <Info label="Horas jogadas">{game.hoursPlayed || 0}h</Info>
                 <Info label="Data de compra">{formatDate(game.purchaseDate)}</Info>
               </div>
@@ -77,14 +83,18 @@ export function GameDetailDialog({ game, onClose, onEdit, onDelete }: GameDetail
                   </span>
                 </div>
                 <div className="pixel-track h-4 w-full overflow-hidden rounded">
-                  <div className="pixel-fill h-full" style={{ width: `${trophyProgress(game)}%` }} />
+                  <div
+                    className="pixel-fill h-full"
+                    style={{ width: `${trophyProgress(game)}%` }}
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <Info label="Dificuldade">
                   <span className="text-tag-difficulty-foreground">
-                    {DIFFICULTIES.find((d) => d.value === game.difficulty)?.label ?? (game.difficulty || "—")}
+                    {DIFFICULTIES.find((d) => d.value === game.difficulty)?.label ??
+                      (game.difficulty || "—")}
                   </span>
                 </Info>
                 <Info label="Nota">
@@ -92,7 +102,8 @@ export function GameDetailDialog({ game, onClose, onEdit, onDelete }: GameDetail
                 </Info>
                 <Info label="Veredito">
                   <span className="text-tag-verdict-foreground">
-                    {VERDICTS.find((v) => v.value === game.verdict)?.label ?? (game.verdict || "Sem veredito")}
+                    {VERDICTS.find((v) => v.value === game.verdict)?.label ??
+                      (game.verdict || "Sem veredito")}
                   </span>
                 </Info>
               </div>
@@ -113,8 +124,18 @@ export function GameDetailDialog({ game, onClose, onEdit, onDelete }: GameDetail
                 <Section title={`Galeria (${game.photoIds.length})`}>
                   {photo && (
                     <div className="relative mb-3">
-                      <StoredImage id={photo} alt={`Foto de ${game.title}`} className="pixel-border max-h-[60vh] w-full rounded-xl object-contain bg-ink" />
-                      <Button variant="tool" size="icon" className="absolute right-2 top-2" onClick={() => setPhoto(null)} aria-label="Fechar foto">
+                      <StoredImage
+                        id={photo}
+                        alt={`Foto de ${game.title}`}
+                        className="pixel-border max-h-[60vh] w-full rounded-xl object-contain bg-ink"
+                      />
+                      <Button
+                        variant="tool"
+                        size="icon"
+                        className="absolute right-2 top-2"
+                        onClick={() => setPhoto(null)}
+                        aria-label="Fechar foto"
+                      >
                         <X />
                       </Button>
                     </div>
@@ -129,21 +150,27 @@ export function GameDetailDialog({ game, onClose, onEdit, onDelete }: GameDetail
                         data-active={photo === id}
                         aria-label={`Ver foto ${i + 1}`}
                       >
-                        <StoredImage id={id} alt={`Foto ${i + 1} de ${game.title}`} className="h-full w-full" />
+                        <StoredImage
+                          id={id}
+                          alt={`Foto ${i + 1} de ${game.title}`}
+                          className="h-full w-full"
+                        />
                       </button>
                     ))}
                   </div>
                 </Section>
               )}
 
-              <div className="flex flex-wrap justify-end gap-3 border-t-2 border-border pt-4">
-                <Button variant="danger-soft" size="lg" onClick={() => onDelete(game)}>
-                  <Trash2 /> Remover
-                </Button>
-                <Button size="lg" onClick={() => onEdit(game)}>
-                  <Pencil /> Editar
-                </Button>
-              </div>
+              {onEdit && onDelete && (
+                <div className="flex flex-wrap justify-end gap-3 border-t-2 border-border pt-4">
+                  <Button variant="danger-soft" size="lg" onClick={() => onDelete(game)}>
+                    <Trash2 /> Remover
+                  </Button>
+                  <Button size="lg" onClick={() => onEdit(game)}>
+                    <Pencil /> Editar
+                  </Button>
+                </div>
+              )}
             </div>
           </>
         )}
