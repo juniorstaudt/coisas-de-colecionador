@@ -4,7 +4,7 @@
 - [x] Storage: this device only, no login (user skipped the choice; default)
 - [x] Pixel-art sunset gradient background + pixel grass footer
 - [x] Dark (default) / light mode with gamer look
-- [x] Live exchange rates for BRL/USD/EUR (fallback to fixed rates offline)
+- [x] Collection totals per purchase currency (R$ / €) instead of live conversion
 - [x] Cover: upload or link
 - [x] Embedded responsive YouTube player (details window)
 - [x] Extra photo gallery per game (upload)
