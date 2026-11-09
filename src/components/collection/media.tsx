@@ -19,6 +19,11 @@ export function StoredImage({ id, alt, className }: { id: string; alt: string; c
 }
 
 export function StarRating({ stars, className }: { stars: number; className?: string }) {
+  if (stars <= 0) {
+    return (
+      <span className={cn("text-xs font-semibold text-muted-foreground", className)}>Sem nota</span>
+    );
+  }
   return (
     <div className={cn("flex gap-0.5", className)} role="img" aria-label={`${stars} de 5 estrelas`}>
       {[1, 2, 3, 4, 5].map((n) => (

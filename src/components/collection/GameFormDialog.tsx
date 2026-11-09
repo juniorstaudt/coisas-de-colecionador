@@ -79,9 +79,10 @@ function fromGame(g: Game): FormState {
     status: g.status,
     trophiesUnlocked: num(g.trophiesUnlocked),
     trophiesTotal: num(g.trophiesTotal),
-    difficulty: g.difficulty || "de boas",
-    stars: g.stars || "5",
-    verdict: g.verdict || "Topzera",
+    // "" is the neutral "not rated yet" choice and must survive editing.
+    difficulty: g.difficulty,
+    stars: g.stars,
+    verdict: g.verdict,
     coverUrl: g.coverUrl || "",
     coverImageId: g.coverImageId,
     youtubeUrl: g.youtubeUrl || "",
@@ -293,6 +294,7 @@ export function GameFormDialog({ open, game, onOpenChange, onSave }: GameFormDia
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <Field label="Dificuldade" htmlFor="difficulty">
               <select id="difficulty" value={form.difficulty} onChange={set("difficulty")} className="field">
+                <option value="">— Sem avaliação —</option>
                 {DIFFICULTIES.map((d) => (
                   <option key={d.value} value={d.value}>{d.label}</option>
                 ))}
@@ -300,6 +302,7 @@ export function GameFormDialog({ open, game, onOpenChange, onSave }: GameFormDia
             </Field>
             <Field label="Nota (Estrelas)" htmlFor="stars">
               <select id="stars" value={form.stars} onChange={set("stars")} className="field">
+                <option value="">— Sem nota —</option>
                 {STAR_OPTIONS.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
@@ -307,6 +310,7 @@ export function GameFormDialog({ open, game, onOpenChange, onSave }: GameFormDia
             </Field>
             <Field label="Veredito" htmlFor="verdict">
               <select id="verdict" value={form.verdict} onChange={set("verdict")} className="field">
+                <option value="">— Sem veredito —</option>
                 {VERDICTS.map((v) => (
                   <option key={v.value} value={v.value}>{v.label}</option>
                 ))}

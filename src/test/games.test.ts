@@ -12,6 +12,8 @@ import {
   isPlatinum,
   loadGames,
   normalizeGame,
+  starCount,
+  verdictName,
   upsertGame,
   youtubeId,
   type Game,
@@ -41,6 +43,13 @@ describe("prices in the currency paid", () => {
   });
   it("treats games saved without a currency as reais", () => {
     expect(normalizeGame({ title: "Old", price: 10 }).currency).toBe("BRL");
+  });
+
+  it("keeps the neutral (unrated) difficulty, stars and verdict", () => {
+    const g = normalizeGame({ title: "Na fila", difficulty: "", stars: "", verdict: "" });
+    expect([g.difficulty, g.stars, g.verdict]).toEqual(["", "", ""]);
+    expect(starCount(g.stars)).toBe(0);
+    expect(verdictName(g.verdict)).toBe("Sem veredito");
   });
 });
 
