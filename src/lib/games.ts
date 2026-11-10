@@ -35,13 +35,16 @@ export const DIFFICULTIES = [
   { value: "pistola", short: "Pistola", label: "Pistola (Pesadelo)" },
 ] as const;
 
-export const STAR_OPTIONS = [
-  { value: "5", label: "⭐⭐⭐⭐⭐ (5/5)" },
-  { value: "4", label: "⭐⭐⭐⭐ (4/5)" },
-  { value: "3", label: "⭐⭐⭐ (3/5)" },
-  { value: "2", label: "⭐⭐ (2/5)" },
-  { value: "1", label: "⭐ (1/5)" },
-] as const;
+/** "4.5" -> "4,5"; whole numbers keep one decimal ("5,0"). */
+export function formatStars(value: number): string {
+  return value.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+}
+
+/** Rating scale from 5.0 down to 1.0 in steps of 0.5; stored as "5", "4.5", … "1". */
+export const STAR_OPTIONS = Array.from({ length: 9 }, (_, i) => {
+  const n = 5 - i * 0.5;
+  return { value: String(n), label: `${"⭐".repeat(Math.floor(n))}${n % 1 ? "½" : ""} (${formatStars(n)}/5)` };
+});
 
 export const VERDICTS = [
   { value: "Nem joga", short: "Nem joga", label: "Nem joga (Péssimo)" },
@@ -153,10 +156,11 @@ export function trophyProgress(game: Pick<Game, "trophiesUnlocked" | "trophiesTo
   return Math.min(100, Math.round((Number(game.trophiesUnlocked) / total) * 100));
 }
 
-/** Unrated games ("") show no stars. */
+/** Unrated games ("") show no stars; ratings snap to the nearest 0.5 between 1 and 5. */
 export function starCount(stars: string): number {
   if (stars === "") return 0;
-  return Number(stars) || 5;
+  const n = Number(stars) || 5;
+  return Math.min(5, Math.max(1, Math.round(n * 2) / 2));
 }
 
 export function difficultyName(value: string): string {

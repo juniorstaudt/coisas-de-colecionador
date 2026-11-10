@@ -1,7 +1,7 @@
 import { Star, Trophy } from "lucide-react";
 
 import { useImageUrl } from "@/hooks/use-image-url";
-import { FALLBACK_COVER, youtubeId, type Game } from "@/lib/games";
+import { FALLBACK_COVER, formatStars, youtubeId, type Game } from "@/lib/games";
 import { cn } from "@/lib/utils";
 
 /** Cover from an uploaded photo, else the link, else a retro placeholder. */
@@ -25,13 +25,25 @@ export function StarRating({ stars, className }: { stars: number; className?: st
     );
   }
   return (
-    <div className={cn("flex gap-0.5", className)} role="img" aria-label={`${stars} de 5 estrelas`}>
-      {[1, 2, 3, 4, 5].map((n) => (
-        <Star
-          key={n}
-          className={cn("size-4", n <= stars ? "fill-star text-star" : "text-muted-foreground/40")}
-        />
-      ))}
+    <div
+      className={cn("flex items-center gap-0.5", className)}
+      role="img"
+      aria-label={`${formatStars(stars)} de 5 estrelas`}
+    >
+      {[1, 2, 3, 4, 5].map((n) => {
+        const fill = stars >= n ? 100 : stars >= n - 0.5 ? 50 : 0;
+        return (
+          <span key={n} className="relative inline-flex size-4">
+            <Star className="size-4 text-muted-foreground/40" />
+            {fill > 0 && (
+              <span className="absolute inset-0 overflow-hidden" style={{ width: `${fill}%` }}>
+                <Star className="size-4 fill-star text-star" />
+              </span>
+            )}
+          </span>
+        );
+      })}
+      <span className="ml-1 text-xs font-bold text-muted-foreground">{formatStars(stars)}</span>
     </div>
   );
 }

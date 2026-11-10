@@ -55,7 +55,7 @@ const EMPTY: FormState = {
   trophiesUnlocked: "",
   trophiesTotal: "",
   difficulty: "de boas",
-  stars: STAR_OPTIONS[0].value,
+  stars: "5",
   verdict: "Topzera",
   coverUrl: "",
   coverImageId: undefined,

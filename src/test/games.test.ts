@@ -8,6 +8,8 @@ import {
   filterGames,
   formatDate,
   formatPrice,
+  formatStars,
+  STAR_OPTIONS,
   imageIdsOf,
   isPlatinum,
   loadGames,
@@ -50,6 +52,18 @@ describe("prices in the currency paid", () => {
     expect([g.difficulty, g.stars, g.verdict]).toEqual(["", "", ""]);
     expect(starCount(g.stars)).toBe(0);
     expect(verdictName(g.verdict)).toBe("Sem veredito");
+  });
+});
+
+describe("star rating scale", () => {
+  it("offers 1.0 to 5.0 in steps of 0.5", () => {
+    expect(STAR_OPTIONS.map((s) => s.value)).toEqual(["5", "4.5", "4", "3.5", "3", "2.5", "2", "1.5", "1"]);
+  });
+  it("keeps half-star ratings", () => {
+    expect(starCount("3.5")).toBe(3.5);
+  });
+  it("shows ratings with one decimal", () => {
+    expect(formatStars(4)).toBe("4,0");
   });
 });
 
