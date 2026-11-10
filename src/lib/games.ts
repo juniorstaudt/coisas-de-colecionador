@@ -9,12 +9,19 @@ export const CURRENCIES: { value: Currency; label: string }[] = [
   { value: "EUR", label: "€ (Euro)" },
 ];
 
-/** Collection types. Only games exist today; music and books are planned. */
+/** Collection sections: tab label, item name in "Adicionar Item", page and count nouns. */
 export const COLLECTION_KINDS = [
-  { id: "games", label: "Jogos", emoji: "🎮", available: true },
-  { id: "music", label: "Música", emoji: "🎵", available: false },
-  { id: "books", label: "Livros", emoji: "📚", available: false },
+  { id: "games", label: "Jogos", item: "Jogo", emoji: "🎮", to: "/", singular: "jogo", plural: "jogos" },
+  { id: "music", label: "Música", item: "Música", emoji: "🎵", to: "/musica", singular: "álbum", plural: "álbuns" },
+  { id: "books", label: "Livros", item: "Livro", emoji: "📚", to: "/livros", singular: "livro", plural: "livros" },
 ] as const;
+
+export type CollectionKind = (typeof COLLECTION_KINDS)[number]["id"];
+
+/** Search param that asks a section to open its "new item" form. */
+export function validateNewItemSearch(search: Record<string, unknown>): { novo?: 1 } {
+  return search["novo"] ? { novo: 1 } : {};
+}
 
 export const PLATFORMS = [
   { value: "PC", label: "PC" },

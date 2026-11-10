@@ -4,9 +4,27 @@ import { useImageUrl } from "@/hooks/use-image-url";
 import { FALLBACK_COVER, formatStars, youtubeId, type Game } from "@/lib/games";
 import { cn } from "@/lib/utils";
 
-/** Cover from an uploaded photo, else the link, else a retro placeholder. */
-export function GameCover({ game, className }: { game: Game; className?: string }) {
+/**
+ * Cover from an uploaded photo, else the link, else a retro placeholder
+ * (the given emoji placeholder, or the arcade photo for games).
+ */
+export function GameCover({
+  game,
+  className,
+  placeholder,
+}: {
+  game: Pick<Game, "title" | "coverUrl" | "coverImageId">;
+  className?: string;
+  placeholder?: string;
+}) {
   const uploaded = useImageUrl(game.coverImageId);
+  if (!game.coverImageId && !game.coverUrl && placeholder) {
+    return (
+      <div className={cn("flex items-center justify-center bg-muted text-5xl", className)} aria-hidden>
+        {placeholder}
+      </div>
+    );
+  }
   const src = game.coverImageId ? uploaded : game.coverUrl || FALLBACK_COVER;
   if (!src) return <div className={cn("bg-muted", className)} aria-hidden />;
   return <img src={src} alt={`Capa de ${game.title}`} loading="lazy" className={cn("object-cover", className)} />;
