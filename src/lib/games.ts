@@ -87,7 +87,7 @@ export const VERDICTS = [
   { value: "Ta valendo", short: "Tá valendo", label: "Tá valendo (Bom)" },
   { value: "Show de bola", short: "Show de bola", label: "Show de bola (Muito Bom)" },
   { value: "Topzera", short: "Topzera", label: "Topzera (Ótimo)" },
-  { value: "Cinema", short: "Cinema", label: "Cinema (Jogo da vida / Obra de arte)" },
+  { value: "Cinema", short: "Obra-de-arte", label: "Obra-de-arte (Jogo da vida)" },
 ] as const;
 
 export interface Game {
