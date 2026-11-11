@@ -11,9 +11,33 @@ export const CURRENCIES: { value: Currency; label: string }[] = [
 
 /** Collection sections: tab label, item name in "Adicionar Item", page and count nouns. */
 export const COLLECTION_KINDS = [
-  { id: "games", label: "Jogos", item: "Jogo", emoji: "🎮", to: "/", singular: "jogo", plural: "jogos" },
-  { id: "music", label: "Música", item: "Música", emoji: "🎵", to: "/musica", singular: "álbum", plural: "álbuns" },
-  { id: "books", label: "Livros", item: "Livro", emoji: "📚", to: "/livros", singular: "livro", plural: "livros" },
+  {
+    id: "games",
+    label: "Jogos",
+    item: "Jogo",
+    emoji: "🎮",
+    to: "/",
+    singular: "jogo",
+    plural: "jogos",
+  },
+  {
+    id: "music",
+    label: "Música",
+    item: "Música",
+    emoji: "🎵",
+    to: "/musica",
+    singular: "álbum",
+    plural: "álbuns",
+  },
+  {
+    id: "books",
+    label: "Livros",
+    item: "Livro",
+    emoji: "📚",
+    to: "/livros",
+    singular: "livro",
+    plural: "livros",
+  },
 ] as const;
 
 export type CollectionKind = (typeof COLLECTION_KINDS)[number]["id"];
@@ -50,7 +74,10 @@ export function formatStars(value: number): string {
 /** Rating scale from 5.0 down to 1.0 in steps of 0.5; stored as "5", "4.5", … "1". */
 export const STAR_OPTIONS = Array.from({ length: 9 }, (_, i) => {
   const n = 5 - i * 0.5;
-  return { value: String(n), label: `${"⭐".repeat(Math.floor(n))}${n % 1 ? "½" : ""} (${formatStars(n)}/5)` };
+  return {
+    value: String(n),
+    label: `${"⭐".repeat(Math.floor(n))}${n % 1 ? "½" : ""} (${formatStars(n)}/5)`,
+  };
 });
 
 export const VERDICTS = [
@@ -121,7 +148,10 @@ export const SEED_GAMES: Game[] = [
   },
 ];
 
-const NUMBER = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const NUMBER = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
 
 /** "R$ 1.299,90" / "€ 59,49". Missing values read "Grátis"; 0 is shown as a price. */
 export function formatPrice(value: number | null | undefined, currency: Currency): string {

@@ -63,7 +63,11 @@ export function ItemCard({ view, placeholder, onOpen, onEdit, onDelete }: CardPr
         aria-label={`Ver detalhes de ${view.title}`}
       >
         <div className="relative h-48 overflow-hidden bg-muted">
-          <GameCover game={view} placeholder={placeholder} className="h-full w-full transition duration-300 group-hover:scale-105" />
+          <GameCover
+            game={view}
+            placeholder={placeholder}
+            className="h-full w-full transition duration-300 group-hover:scale-105"
+          />
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
             <Badges badges={view.badges} />
           </div>
@@ -85,7 +89,9 @@ export function ItemCard({ view, placeholder, onOpen, onEdit, onDelete }: CardPr
 
         <div className="p-5">
           <h4 className="mb-1 line-clamp-1 text-lg font-extrabold">{view.title}</h4>
-          <p className="mb-3 line-clamp-1 text-xs font-semibold text-muted-foreground">{view.subtitle}</p>
+          <p className="mb-3 line-clamp-1 text-xs font-semibold text-muted-foreground">
+            {view.subtitle}
+          </p>
           <div className="mb-3 grid grid-cols-2 gap-2 rounded-xl bg-muted p-3 text-xs">
             {view.stats.map((s) => (
               <div key={s.label}>
@@ -94,7 +100,9 @@ export function ItemCard({ view, placeholder, onOpen, onEdit, onDelete }: CardPr
               </div>
             ))}
           </div>
-          <p className="line-clamp-2 text-xs italic text-muted-foreground">"{view.review || "Sem review cadastrado."}"</p>
+          <p className="line-clamp-2 text-xs italic text-muted-foreground">
+            "{view.review || "Sem review cadastrado."}"
+          </p>
         </div>
       </button>
 
@@ -105,7 +113,12 @@ export function ItemCard({ view, placeholder, onOpen, onEdit, onDelete }: CardPr
             <Button variant="tool" size="icon" onClick={onEdit} aria-label={`Editar ${view.title}`}>
               <Pencil />
             </Button>
-            <Button variant="danger-soft" size="icon" onClick={onDelete} aria-label={`Remover ${view.title}`}>
+            <Button
+              variant="danger-soft"
+              size="icon"
+              onClick={onDelete}
+              aria-label={`Remover ${view.title}`}
+            >
               <Trash2 />
             </Button>
           </div>
@@ -142,13 +155,19 @@ export function ItemDetailDialog({ view, placeholder, onClose, onEdit, onDelete 
 
             <div className="space-y-6 p-5 sm:p-6">
               <div className="min-w-0">
-                <DialogTitle className="text-2xl font-extrabold leading-tight">{view.title}</DialogTitle>
-                <DialogDescription className="mt-1 text-sm font-semibold text-muted-foreground">{view.subtitle}</DialogDescription>
+                <DialogTitle className="text-2xl font-extrabold leading-tight">
+                  {view.title}
+                </DialogTitle>
+                <DialogDescription className="mt-1 text-sm font-semibold text-muted-foreground">
+                  {view.subtitle}
+                </DialogDescription>
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {view.details.map((d) => (
-                  <Info key={d.label} label={d.label}>{d.value}</Info>
+                  <Info key={d.label} label={d.label}>
+                    {d.value}
+                  </Info>
                 ))}
                 <Info label="Nota">
                   <StarRating stars={starCount(view.stars)} className="pt-0.5" />
@@ -156,7 +175,9 @@ export function ItemDetailDialog({ view, placeholder, onClose, onEdit, onDelete 
               </div>
 
               <Section title="Review pessoal">
-                <p className="whitespace-pre-line text-sm leading-relaxed">{view.review || "Sem review cadastrado."}</p>
+                <p className="whitespace-pre-line text-sm leading-relaxed">
+                  {view.review || "Sem review cadastrado."}
+                </p>
               </Section>
 
               {view.youtubeUrl && (
@@ -169,8 +190,18 @@ export function ItemDetailDialog({ view, placeholder, onClose, onEdit, onDelete 
                 <Section title={`Galeria (${view.photoIds.length})`}>
                   {photo && (
                     <div className="relative mb-3">
-                      <StoredImage id={photo} alt={`Foto de ${view.title}`} className="pixel-border max-h-[60vh] w-full rounded-xl bg-ink object-contain" />
-                      <Button variant="tool" size="icon" className="absolute right-2 top-2" onClick={() => setPhoto(null)} aria-label="Fechar foto">
+                      <StoredImage
+                        id={photo}
+                        alt={`Foto de ${view.title}`}
+                        className="pixel-border max-h-[60vh] w-full rounded-xl bg-ink object-contain"
+                      />
+                      <Button
+                        variant="tool"
+                        size="icon"
+                        className="absolute right-2 top-2"
+                        onClick={() => setPhoto(null)}
+                        aria-label="Fechar foto"
+                      >
                         <X />
                       </Button>
                     </div>
@@ -185,7 +216,11 @@ export function ItemDetailDialog({ view, placeholder, onClose, onEdit, onDelete 
                         data-active={photo === id}
                         aria-label={`Ver foto ${i + 1}`}
                       >
-                        <StoredImage id={id} alt={`Foto ${i + 1} de ${view.title}`} className="h-full w-full" />
+                        <StoredImage
+                          id={id}
+                          alt={`Foto ${i + 1} de ${view.title}`}
+                          className="h-full w-full"
+                        />
                       </button>
                     ))}
                   </div>

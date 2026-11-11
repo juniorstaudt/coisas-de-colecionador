@@ -10,7 +10,11 @@ export interface CollectionItem {
 }
 
 /** Saved items under `key`, with missing fields filled in; nothing saved (or unreadable) → []. */
-export function loadItems<T>(storage: StorageLike, key: string, normalize: (raw: Partial<T>) => T): T[] {
+export function loadItems<T>(
+  storage: StorageLike,
+  key: string,
+  normalize: (raw: Partial<T>) => T,
+): T[] {
   try {
     const raw = storage.getItem(key);
     const parsed = raw ? (JSON.parse(raw) as unknown) : null;

@@ -10,6 +10,7 @@
 - [x] Extra photo gallery per game (upload)
 - [x] Shiny "Platina (100%)" seal
 - [x] Verdict label "Cinema" = Jogo da vida / Obra de arte
-- [x] Structure ready to add music and books later ("em breve" tabs)
+- [x] Música and Livros sections
 - [x] Responsive check (mobile + desktop)
 - [x] Google login and cloud sync removed (owner-only catalog, kept in the browser)
+- [x] "Adicionar Item" button: choose Jogo, Música or Livro

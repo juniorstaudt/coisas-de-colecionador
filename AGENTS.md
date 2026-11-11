@@ -31,11 +31,11 @@ use the editor.
 
 ## Project rules
 
-- The game collection lives only in this browser's localStorage (`colecionador_jogos`) via `useGameCollection`; there is no login and the app does not read or write Supabase (the old `games` table and `game-images` bucket are unused). Why: single-owner personal catalog, owner dropped login.
+- Collections live only in this browser's localStorage, one key per kind (games `colecionador_jogos` via `useGameCollection`; music/books via `useLocalCollection` with their own keys); never rename or reuse a key, since publishing must not touch saved data; there is no login and the app does not read or write Supabase (the old `games` table and `game-images` bucket are unused). Why: single-owner personal catalog, owner dropped login.
 - Uploaded photos (covers, gallery) are stored as blobs in IndexedDB via `src/lib/image-store.ts`; games keep only image ids, and removing a game or photo deletes its blobs. Why: localStorage is too small for images.
 - Prices are stored exactly as paid with a per-game `currency` (BRL or EUR) and are never converted; the header shows `collectionTotals` per currency. Why: owner wants real totals per purchase currency, not live conversion.
 - Theme: `dark` class on <html> is the SSR default; an inline head script removes it when the visitor chose light (`src/hooks/use-theme.ts`). Why: avoids a light/dark flash on load.
-- Collection types are listed in `COLLECTION_KINDS`; new kinds (music, books) should get their own model module and route rather than overloading `Game`. Why: keeps each collection's fields independent.
+- Collection kinds are listed in `COLLECTION_KINDS` (games, music, books); each has its own model module (`games.ts`, `music.ts`, `books.ts`) and route, sharing `CollectionShell`; "Adicionar Item" navigates to the chosen route with `?novo=1`, which opens that page's form. Why: keeps each collection's fields independent.
 - Collection business rules (currency rates, cost per hour, platinum, filters) live as pure functions in `src/lib/games.ts` with tests in `src/test/games.test.ts`. Why: keeps rules testable and separate from UI.
 - The owner's spreadsheet lives as generated data in `src/data/imported-games.json` (built with `src/lib/spreadsheet-import.ts`) and is merged once per browser into the local collection, guarded by a localStorage flag. Why: the owner wanted the games in without signing in.
 - Add/edit/delete controls show only in "modo dono": `src/lib/owner.functions.ts` checks the `OWNER_PASSWORD` secret on the server (constant-time) and stores the flag in an encrypted `useSession` cookie (`SESSION_SECRET`); the index loader reads it via `getOwnerStatus`. Why: simplest owner-only editing without user accounts.

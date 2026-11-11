@@ -18,7 +18,12 @@ interface ConfirmRemoveDialogProps {
   onConfirm: () => void;
 }
 
-export function ConfirmRemoveDialog({ title, noun, onCancel, onConfirm }: ConfirmRemoveDialogProps) {
+export function ConfirmRemoveDialog({
+  title,
+  noun,
+  onCancel,
+  onConfirm,
+}: ConfirmRemoveDialogProps) {
   return (
     <AlertDialog open={title !== null} onOpenChange={(o) => !o && onCancel()}>
       <AlertDialogContent className="pixel-border rounded-2xl bg-card">
@@ -30,7 +35,10 @@ export function ConfirmRemoveDialog({ title, noun, onCancel, onConfirm }: Confir
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={onConfirm}>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={onConfirm}
+          >
             Remover
           </AlertDialogAction>
         </AlertDialogFooter>

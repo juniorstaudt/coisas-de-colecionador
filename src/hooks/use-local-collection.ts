@@ -5,7 +5,10 @@ import { deleteImages } from "@/lib/image-store";
 import { loadItems, saveItems, upsertItem, type CollectionItem } from "@/lib/local-collection";
 
 /** A collection (music, books) kept in this browser under its own localStorage key. */
-export function useLocalCollection<T extends CollectionItem>(key: string, normalize: (raw: Partial<T>) => T) {
+export function useLocalCollection<T extends CollectionItem>(
+  key: string,
+  normalize: (raw: Partial<T>) => T,
+) {
   const [items, setItems] = useState<T[]>([]);
   const [ready, setReady] = useState(false);
 

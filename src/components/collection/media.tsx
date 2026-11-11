@@ -20,17 +20,35 @@ export function GameCover({
   const uploaded = useImageUrl(game.coverImageId);
   if (!game.coverImageId && !game.coverUrl && placeholder) {
     return (
-      <div className={cn("flex items-center justify-center bg-muted text-5xl", className)} aria-hidden>
+      <div
+        className={cn("flex items-center justify-center bg-muted text-5xl", className)}
+        aria-hidden
+      >
         {placeholder}
       </div>
     );
   }
   const src = game.coverImageId ? uploaded : game.coverUrl || FALLBACK_COVER;
   if (!src) return <div className={cn("bg-muted", className)} aria-hidden />;
-  return <img src={src} alt={`Capa de ${game.title}`} loading="lazy" className={cn("object-cover", className)} />;
+  return (
+    <img
+      src={src}
+      alt={`Capa de ${game.title}`}
+      loading="lazy"
+      className={cn("object-cover", className)}
+    />
+  );
 }
 
-export function StoredImage({ id, alt, className }: { id: string; alt: string; className?: string }) {
+export function StoredImage({
+  id,
+  alt,
+  className,
+}: {
+  id: string;
+  alt: string;
+  className?: string;
+}) {
   const src = useImageUrl(id);
   if (!src) return <div className={cn("animate-pulse bg-muted", className)} aria-hidden />;
   return <img src={src} alt={alt} loading="lazy" className={cn("object-cover", className)} />;
@@ -83,7 +101,12 @@ export function YouTubeEmbed({ url, title }: { url: string; title: string }) {
   const id = youtubeId(url);
   if (!id) {
     return (
-      <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-primary underline">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm font-bold text-primary underline"
+      >
         Abrir vídeo em outra aba
       </a>
     );
